@@ -5,16 +5,16 @@
 
 ;; Procedures (functions) are just values. You can pass them around.
 (define (apply-op f a b) (f a b))
-(check-equal? (apply-op * 3 3) "?")
-(check-equal? (apply-op + 3 3) "?")
-(check-equal? (apply-op - 3 3) "?")
+(check-equal? (apply-op * 3 3) 9)
+(check-equal? (apply-op + 3 3) 6)
+(check-equal? (apply-op - 3 3) 0)
 
 ;; Not all procedures need a name. `lambda` returns a new anonymous procedure.
 (check-equal?
   (apply-op
     (lambda (a b) (+ (* a a) (* b b)))
     3 4)
-  "?")
+  (* 5 5))
 
 ;; Procedures can return other procedures. Notice the 'enclosed' binding.
 (define (make-fn enclosed) (lambda () enclosed))
@@ -24,12 +24,16 @@
 (define returns-number (make-fn 3.14))
 
 ;; Created procedures remember the bindings leading up to them.
-(check-equal? (returns-string) "?")
-(check-equal? (returns-number) "?")
+(check-equal? (returns-string) "Hey handsome.")
+(check-equal? (returns-number) 3.14)
 
 ;; Create a procedure that returns a new square of an integer
 ;; i each time it is called, starting from i = 0.
-(define (next-square) "?")
+(define counter 0)
+(define (next-square)
+  (let [(v counter)]
+    (set! counter (+ v 1))
+    (* v v)))
 
 (define (check-square n)
   (let ([expected (* n n)] [actual (next-square)])
@@ -44,7 +48,7 @@
 ;; Write a version of the ceiling function called `my-ceil` with a contract
 ;; that allows all inexact numbers except those that have no exact
 ;; representation, and that will always return an exact number.
-(define (my-ceil n) "?")
+(define (my-ceil n) (exact-ceiling n))
 
 ;; The below instrumentation checks your work.
 (define (my-ceil-valid? n)
@@ -71,21 +75,32 @@
 ;; character that defaults to a single blank space as the first argument.
 ;; Have a contract enforce these precise restrictions. Hint: You will
 ;; need 'case->'
-(define (my-join) "?")
+(define/contract (join delim num . rest)
+  (->* (string? integer?) () #:rest (listof integer?) string?)
+  (let [(chunk (number->string num))]
+    (if (empty? rest)
+        chunk
+        (string-append chunk delim (apply join delim rest)))))
 
+(define/contract (my-join arg . args)
+  (->* ((or/c char? integer?)) () #:rest (listof integer?) string?)
+  (if (integer? arg)
+      (apply join " " arg args)
+      (apply join (make-string 1 arg) args)))
+  
 (let ([arity (procedure-arity my-join)])
   (if
     (and
       (arity-at-least? arity)
-      (eqv? arity-at-least-value 1))
+      (eqv? (arity-at-least-value arity) 1))
     (begin
        (check-equal? (my-join #\- 1 2 3) "1-2-3")
        (check-equal? (my-join #\space 1 2 3) "1 2 3")
        (check-equal? (my-join 1 2 3) "1 2 3")
        (check-equal? (my-join #\space 1) "1")
        (check-equal? (my-join 1) "1")
-       (check-exn (λ () (my-join #\?)))
-       (check-exn (λ () (my-join ",")))
-       (check-exn (λ () (my-join #\space "a" "b")))
-       (check-exn (λ () (my-join "," 0.1 9))))
+       (check-exn exn:fail? (λ () (my-join #\?)))
+       (check-exn exn:fail? (λ () (my-join ",")))
+       (check-exn exn:fail? (λ () (my-join #\space "a" "b")))
+       (check-exn exn:fail? (λ () (my-join "," 0.1 9))))
     (fail "Double check your signature of my-join")))

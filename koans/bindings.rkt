@@ -13,7 +13,7 @@
 
 (check-equal?
   (with-shadow)
-  "?"
+  "This is my turf."
   "One binding can shadow another")
 
 ;; You need one `define` for every new binding. This can get old.
@@ -33,11 +33,11 @@
 ;; As always, the last expression in the body is the resulting value
 ;; of the entire 'let' expression.
 (check-equal?
-  (let ([a 0] [b 1] [c 2] [d 3]) "?")
+  (let ([a 0] [b 1] [c 2] [d 3]) (+ a b c d))
   (defined-function-defines-so-many-defines-with-define-make-it-stop))
 
 (check-equal?
   (let ([a 1] [b 1])
       (+ a b)) ; In `let*`, you can refer to earlier bindings.
   (let* ([a 1] [b (+ a 1)])
-      "?"))
+      b))
