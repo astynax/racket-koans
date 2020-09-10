@@ -6,7 +6,7 @@
 
 
 ;; Make a pair matching expectations.
-(define pair "?")
+(define pair (cons "first" (cons "second" '())))
 (if (pair? pair)
   (begin
     (check-equal? (car pair) "first")
@@ -14,7 +14,12 @@
   (fail "Define a pair"))
 
 ;; Make a list of the first 1000 positive integers. Do not type it longhand.
-(define thousand "?")
+(define (range f t)
+  (if (< f t)
+      (cons f (range (add1 f) t))
+      '()))
+
+(define thousand (range 1 1001))
 
 (define (counter-matches-element lst i)
   (if (null? lst)
@@ -31,7 +36,12 @@
 
 ;; Transform `thousand` into 'only-punc', which is a list of
 ;; characters such that every element matches char-punctuation?
-(define only-punc "?")
+(define (take l n)
+  (if (<= n 0) '()
+      (cons (car l) (take (cdr l) (sub1 n)))))
+
+(define only-punc (map (λ (_) #\.) (take thousand 32)))
+
 (if (list? thousand)
   (check-true
     (and

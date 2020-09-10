@@ -3,11 +3,11 @@
 (require rackunit)
 
 ;; Arithmetic procedures resemble prefix notation.
-(check-equal? (+ 1 0) 2)
-(check-equal? (* 1 0) 1)
-(check-equal? (/ 4 2) 1)
-(check-equal? (- 1 1) 1)
-(check-equal? (+ (+ 2 (* 3 3)) (+ 76 11)) 0)
+(check-equal? (+ 1 0) 1)
+(check-equal? (* 1 0) 0)
+(check-equal? (/ 4 2) 2)
+(check-equal? (- 1 1) 0)
+(check-equal? (+ (+ 2 (* 3 3)) (+ 76 11)) 98)
 
 ;; Number types are carefully categorized in Racket. We've used equal? tests
 ;; via rackunit for everything leading up to now, but that's not the whole
@@ -22,11 +22,11 @@
 ;; See https://docs.racket-lang.org/reference/numbers.html
 (check-equal?
     (= 3 3.0)
-    "?"
+    #t
     "3 and 3.0 may appear to be equal to some...")
 (check-equal?
     (eqv? 3 3.0)
-    "?"
+    #f
     "...but they are not equivalent.")
 
 
@@ -36,17 +36,17 @@
 
 ;; Using only 'exact?' and 'inexact?', categorize these numbers.
 (define (replaceme x) #f)
-(check-pred replaceme #i0)
-(check-pred replaceme -1)
-(check-pred replaceme 1)
-(check-pred replaceme #i#b100)
-(check-pred replaceme 999999999999999)
-(check-pred replaceme 2/3)
-(check-pred replaceme #e2/3)
-(check-pred replaceme #i0)
-(check-pred replaceme 1/2+8/9i)
-(check-pred replaceme 0.1)
-(check-pred replaceme (* 34 0.1))
-(check-pred replaceme #e.23e+42)
-(check-pred replaceme -inf.0)
-(check-pred replaceme +nan.0)
+(check-pred inexact? #i0)
+(check-pred exact? -1)
+(check-pred exact? 1)
+(check-pred inexact? #i#b100)
+(check-pred exact? 999999999999999)
+(check-pred exact? 2/3)
+(check-pred exact? #e2/3)
+(check-pred inexact? #i0)
+(check-pred exact? 1/2+8/9i)
+(check-pred inexact? 0.1)
+(check-pred inexact? (* 34 0.1))
+(check-pred exact? #e.23e+42)
+(check-pred inexact? -inf.0)
+(check-pred inexact? +nan.0)

@@ -4,10 +4,10 @@
 
 
 ;; Racket has mutable and immutable strings.
-(check-equal? (immutable? "Giraffe") "?")
-(check-equal? (immutable? (make-string 10 #\a)) "?")
-(check-equal? (immutable? (string #\a #\b #\c)) "?")
-(check-equal? (immutable? (string-copy (string))) "?")
+(check-equal? (immutable? "Giraffe") #t)
+(check-equal? (immutable? (make-string 10 #\a)) #f)
+(check-equal? (immutable? (string #\a #\b #\c)) #f)
+(check-equal? (immutable? (string-copy (string))) #f)
 
 (define dotphabet
   (build-string 26 (lambda (i)
@@ -16,11 +16,16 @@
       #\.))))
 
 ;; When test results guide you, these are gimmes.
-(check-equal? (string-ref dotphabet 8) "?")
-(check-equal? (string-ref dotphabet 19) "?")
-(check-eqv? (string-length dotphabet) "?")
-(check-equal? (string-downcase dotphabet) "?")
+(check-equal? (string-ref dotphabet 8) #\I)
+(check-equal? (string-ref dotphabet 19) #\.)
+(check-eqv? (string-length dotphabet) 26)
+(check-equal? (string-downcase dotphabet) "a.c.e.g.i.k.m.o.q.s.u.w.y.")
 
 ;; Without mutating `dotphabet`, produce the string shown
 ;; using a single expression.
-(check-equal? "?" "u#s#q")
+(check-equal?
+ (string (char-downcase (string-ref dotphabet 20))
+         #\#
+         (char-downcase (string-ref dotphabet 18))
+         #\#
+         (char-downcase (string-ref dotphabet 16))) "u#s#q")
